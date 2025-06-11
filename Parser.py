@@ -1,9 +1,9 @@
 import re
-import scipy
+# import scipy
 import numpy as np
 import os
 from scipy.sparse import csr_matrix, lil_matrix
-import argparse
+# import argparse
 
 
 def flatten(l):
@@ -25,23 +25,24 @@ def getverilogs(path = './'):
     return [trainverilogs, valverilogs, testverilogs]
 
 def myreadlines(f, newline):
-  buf = ""
-  while True:
-    while newline in buf:
-        pos = buf.index(newline)
-        yield buf[:pos]
-        buf = buf[pos + len(newline):]
-    chunk = f.read(4096)
-    if not chunk:
-        yield buf
-        break
-    buf += chunk
+    buf = ""
+    while True:
+        while newline in buf:
+            pos = buf.index(newline)
+            yield buf[:pos]
+            buf = buf[pos + len(newline):]
+        chunk = f.read(4096)
+        if not chunk:
+            if buf:
+                yield buf
+            break
+        buf += chunk
 
 def readlogs(verilog_list):
     ret = []
     for i in verilog_list:
         temp = []
-        with open(i) as f:
+        with open(i, encoding='utf-8') as f:
             for l in myreadlines(f, ';'):
                 temp.append(l)
         ret.append(temp)
@@ -98,9 +99,9 @@ def getprimlist(linelist):
                 temp = temp.split(',')
 
                 for prim in temp:
-                    if re.match('\[\d*:\d*]', prim):
+                    if re.match(r'\[\d*:\d*]', prim):
                         numbering, name = prim.split(' ')
-                        stop, start = re.findall('\d+', prim)
+                        stop, start = re.findall(r'\d+', prim)
                         for i in range(int(start), int(stop) + 1):
                             if 'input' in l:
                                 priminlist.append(name+'['+str(i)+']')
@@ -143,17 +144,17 @@ def fixassigns(linelist):
 
 
 def getinfo(line):
-    x = re.match('module ([a-zA-Z0-9]+) \([\s,a-zA-Z0-9]+\); \s+(input [a-zA-Z0-9,\s]+;)? \s+(output [a-zA-Z0-9,\s]+;)?', line)
+    x = re.match(r'module ([a-zA-Z0-9]+) \([\s,a-zA-Z0-9]+\); \s+(input [a-zA-Z0-9,\s]+;)? \s+(output [a-zA-Z0-9,\s]+;)?', line)
     if x == None:
         return [line.split(" ")[1], None, None]
     name = x.group(1)
     inputs = x.group(2)
     outputs = x.group(3)
     if inputs != None:
-        z = re.match('input ((\w+,? ?)+)', inputs)
+        z = re.match(r'input ((\w+,? ?)+)', inputs)
         inputs = z.group(1).split(", ")
     if outputs != None:
-        y = re.match('output ((\w+,? ?)+)', outputs)
+        y = re.match(r'output ((\w+,? ?)+)', outputs)
         outputs = y.group(1).split(", ")
 
     return (name, inputs, outputs)
@@ -161,14 +162,12 @@ def getinfo(line):
 def getlineinfo(line):
     line = line.replace("\n", "").lstrip()
     line = re.sub(' +', ' ', line)
-    #print(line)
-    #x = re.match('(([a-zA-Z0-9]+)) \\\\(\w)+[^\s]+ (\([\/a-zA-Z0-9\s_\),.\(\\\\]+)', line)
-    #x = re.match('(([a-zA-Z0-9]+)) \\\\(\w)+[^\s]+ (\([\/a-zA-Z0-9\s_\)\[\],.\(\\\\]+)', line)
-    #x = re.match(r"(([a-zA-Z0-9]+)) \\(\w+)[^\s]+ (\([\/a-zA-Z0-9\s_\),.\(\\\\\[\]]+)", line)
-    #x = re.match(r"(([a-zA-Z0-9]+)) \\?(\w+)[^\s]* (\([\/a-zA-Z0-9\s_\),.\(\\\\\[\]]+)", line)
-    #print(line)
+
     x = re.match(r"(([a-zA-Z0-9_]+))\s*\\?(\w+)[^\s]*\s*(\([\/a-zA-Z0-9\s_\'),.\(\\\\\[\]]+)", line)
-    #print(x)
+    if x is None:
+        print(f"Warning: getlineinfo 無法匹配行: {line}")
+        return None
+
     gatetype, instancename = x.group(0).split(' ')[0], x.group(0).split(' ')[1]
     label = x.group(3)
 
@@ -183,19 +182,20 @@ def getlineinfo(line):
     ports[-1] = ports[-1][:-2]
     portnames = []
     connectionnames = []
-    
+
     for lin in ports:
         z = lin.replace(' ','')
-        #print(z)
-        #zz = re.match('.([A-Z0-9]+)\(\\\\([a-zA-Z-0-9_\/]+)', z)
-        zz = re.match('\.([a-zA-Z0-9_]+)\(([\\\/a-zA-Z-0-9_\/\[\]]+)', z)
+        zz = re.match(r'\.([a-zA-Z0-9_]+)\(([\\\/a-zA-Z0-9_\-\[\]]+)\)', z)
+        if zz is None:
+            print(f"Warning: port解析失敗: {z}")
+            continue
         portname = zz.group(1)
-        zz
         portconnection = zz.group(2)
         portnames.append(portname)
         connectionnames.append(portconnection)
-    
-    return(gatetype, gatetypetrunc, instancename, label, portnames, connectionnames)
+
+    return (gatetype, gatetypetrunc, instancename, label, portnames, connectionnames)
+
 
 def parse_modules(module_list):
     modules = dict()
@@ -207,10 +207,10 @@ def parse_modules(module_list):
 def clean_1(lines):
     for l in range(0,len(lines)):
         if 'SDFFX1' in lines[l] and '.QN()' in lines[l]:
-            lines[l] = re.sub(',\s*.QN\(\)', '',lines[l])
+            lines[l] = re.sub(r',\s*.QN\(\)', '',lines[l])
             lines[l] = lines[l].replace('SDFFX1 ', 'SDFFX12 ')
         if '//' in lines[l]:
-            lines[l] = re.sub('\n*//[^\n]*\n', '', lines[l])
+            lines[l] = re.sub(r'\n*//[^\n]*\n', '', lines[l])
         lines[l].replace('\n', '')
 
 def parse_lines(lines):
@@ -418,10 +418,10 @@ def save_output(trainindices, valindices, testindices, adj, adj_train, class_map
     save_npz('adj_full.npz', adj_full)
     save_npz('adj_train.npz', adj_train)
 
-    with open('class_map.json', 'w') as fp:
+    with open('class_map.json', 'w', encoding='utf-8') as fp:
         json.dump(class_map, fp)
 
-    with open('role.json', 'w') as fp:
+    with open('role.json', 'w', encoding='utf-8') as fp:
         json.dump(role, fp)
 
     np.save('feats.npy', feats, allow_pickle=False)
@@ -429,22 +429,18 @@ def save_output(trainindices, valindices, testindices, adj, adj_train, class_map
 def recordinfo(infolistlist, vlist):
     i = 0
     testname = vlist[2][0][7:]
-    with open('logfile' + testname, 'w') as f:
+    with open('logfile' + testname, 'w', encoding='utf-8') as f:
             print(testname, file = f)
     for info in infolistlist:
         for l in info:
-            with open('logfile' + testname, 'a') as f:
+            with open('logfile' + testname, 'a', encoding='utf-8') as f:
                 print(i, ' : ', l[2], ' : ', l[1], file = f)
             i += 1
     
 
 def main():
 
-
-
     veriloglistlist = getverilogs()
-
-
     lines = []
     for v in veriloglistlist:
         lines.append(readlogs(v))

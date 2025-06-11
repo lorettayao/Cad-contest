@@ -8,6 +8,24 @@ endmodule
 `endcelldefine
 
 `celldefine
+module dff(D,CK,RN,SN,Q);
+    input D;     
+    input CK;    
+    input RN;     
+    input SN;     
+    output Q;   
+endmodule
+`endcelldefine
+
+`celldefine
+module top(n0, n1, n2, n3, n4, n5);
+    input n0, n1;
+    input [127:0] n2;
+    output [63:0] n3, n4, n5; 
+endmodule
+`endcelldefine
+
+`celldefine
 module AND3X1 (IN1, IN2, IN3, Q);
     input IN1, IN2, IN3;
     output Q;
