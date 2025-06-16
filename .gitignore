@@ -1,0 +1,6 @@
+official_data/
+class_map.json
+feats.npy
+*.npz
+gate_map.json
+role.json
