@@ -266,19 +266,21 @@ def build_graph_features(infolist, primary_inputs=None, primary_outputs=None):
     return adj, feats, train_indices, class_map, gate_map
 
 # ===== Step 4: 儲存 GraphSAGE 所需格式 =====
-def save_graphsage_format(adj, feats, class_map, train_indices, gate_map):
-    save_npz("adj_full.npz", adj.tocsr())
-    save_npz("adj_train.npz", adj.tocsr())  # 簡化處理：用一樣的
+def save_graphsage_format(adj, feats, class_map, train_indices, gate_map, output_dir):
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+    save_npz(f"{output_dir}/adj_full.npz", adj.tocsr())  # 儲存完整的 adjacency matrix
+    save_npz(f"{output_dir}/adj_train.npz", adj.tocsr())  # 訓練用的 adjacency matrix, 此處與完整的相同
 
-    np.save("feats.npy", feats, allow_pickle=False)
+    np.savez(f"{output_dir}/feat_full.npz", feats=feats, allow_pickle=False)  # 儲存完整的 features
 
-    with open("class_map.json", "w") as f:
+    with open(f"{output_dir}/class_map.json", "w") as f:
         json.dump(class_map, f)
 
-    with open("role.json", "w") as f:
+    with open(f"{output_dir}/role.json", "w") as f:
         json.dump({'tr': train_indices, 'va': [], 'te': []}, f)
 
-    with open("gate_map.json", "w") as f:  # <== 新增這段
+    with open(f"{output_dir}/gate_map.json", "w") as f:  # <== 新增這段
         json.dump(gate_map, f)
 
 # ===== 主流程 =====
@@ -303,7 +305,8 @@ def process_single_verilog(filepath, gt_trojan_filepath=None):
                 trojan_gates = []
     infolist = gates_to_infolist(gates, trojan_gates)
     adj, feats, train_indices, class_map, gate_map = build_graph_features(infolist, primary_inputs, primary_outputs)
-    save_graphsage_format(adj, feats, class_map, train_indices, gate_map)
+    output_dir = "./output/" + os.path.splitext(os.path.basename(filepath))[0]
+    save_graphsage_format(adj, feats, class_map, train_indices, gate_map, output_dir)
 
     print("✅ Graph feature files saved.")
 
@@ -311,7 +314,7 @@ if __name__ == "__main__":
     # design_folder = ./process_data/
     # gt_trojan_folder = ./gt_data/
     # process through all design files in the design_folder
-    for i in range(1):
+    for i in range(30):
         design_file = f"./process_data/design{i}.v"
         gt_trojan_file = f"./gt_data/result{i}.txt"
         if os.path.exists(design_file):
