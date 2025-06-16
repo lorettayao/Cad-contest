@@ -1,0 +1,1 @@
+python3 -m graphsaint.pytorch_version.train --data_prefix ./data/parsered_features --train_config ./train_config/DATE21.yml --gpu 1
