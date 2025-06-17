@@ -234,6 +234,7 @@ def build_graph_features(infolist, primary_inputs=None, primary_outputs=None):
         if signal not in lookup:
             class_map[node_index] = 0
             gate_map[node_index] = signal
+            continue
         for j in lookup[signal]:  # 所有吃這個 signal 的 gate
             adj[node_index, j] = True  # PI ➜ gate
             feats[node_index][-1] += 1  # PI 的 out degree
