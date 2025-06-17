@@ -127,6 +127,7 @@ class GraphSAINT(nn.Module):
             return torch.nn.BCEWithLogitsLoss(weight=norm_loss,reduction='sum')(preds, labels)
         else:
             _ls = torch.nn.CrossEntropyLoss(reduction='none')(preds, labels)
+            norm_loss = norm_loss.to(_ls.device)
             return (norm_loss*_ls).sum()
 
 
