@@ -231,8 +231,6 @@ def build_graph_features(infolist, primary_inputs=None, primary_outputs=None):
 
     for i, signal in enumerate(primary_inputs):
         node_index = i + len(infolist)  # primary input 的 node index
-        if signal not in lookup:
-            continue
         for j in lookup[signal]:  # 所有吃這個 signal 的 gate
             adj[node_index, j] = True  # PI ➜ gate
             feats[node_index][-1] += 1  # PI 的 out degree
