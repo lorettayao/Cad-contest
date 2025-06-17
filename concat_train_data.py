@@ -9,9 +9,9 @@ from pathlib import Path
 
 def load_data(dataset, index):
     """Load individual dataset components."""
-    dataset_dir = os.path.join(dataset, f'design_{index}')
+    dataset_dir = os.path.join(dataset, f'design{index}')
     adj_path = os.path.join(dataset_dir, f'adj_full.npz')
-    features_path = os.path.join(dataset_dir, f'feat_full.npy')
+    features_path = os.path.join(dataset_dir, f'feat_full.npz')
     trojan_map_path = os.path.join(dataset_dir, f'class_map.json')
     
     adj = load_npz(adj_path)
@@ -61,7 +61,7 @@ def main():
         adj_matrix, features, trojan_map = load_data(args.dataset, i)
 
         # please check if there is any nan in adj_matrix and features, is nan print out
-        
+        features = features['feats']
         if np.isnan(features).any():
             print("nan found in features")
             continue
