@@ -102,56 +102,56 @@ def parse_verilog(verilog_code):
         # 解析 BUF gate
         buf_match = re.match(r'^\s*buf\s+(\S+)\((\S+),\s*(\S+)\);', line)
         if buf_match:
-            gates.append(('BUF', buf_match.group(1), buf_match.group(2), buf_match.group(3)))  # buf, output, input
+            gates.append((0, buf_match.group(1), buf_match.group(2), buf_match.group(3)))  # buf, output, input
             continue
 
         # 解析 DFF gate（具名端口的 DFF gate，處理 .RN, .SN 等）
         dff_match = re.match(r'^\s*dff\s+(\S+)\s*\(\.RN\(([^)]+)\),\s*\.SN\(([^)]+)\),\s*\.CK\(([^)]+)\),\s*\.D\(([^)]+)\),\s*\.Q\(([^)]+)\)\);', line)
         if dff_match:
-            gates.append(('DFF', dff_match.group(1), dff_match.group(6), dff_match.group(3),
+            gates.append((1, dff_match.group(1), dff_match.group(6), dff_match.group(3),
                           dff_match.group(4), dff_match.group(5), dff_match.group(2)))  # dff, RN, SN, CK, D, Q
             continue
 
         # 解析 OR gate (雙輸入 gate)
         or_match = re.match(r'^\s*or\s+(\S+)\((\S+)\s*,\s*(\S+)\s*,\s*(\S+)\);', line)
         if or_match:
-            gates.append(('OR', or_match.group(1), or_match.group(2), or_match.group(3), or_match.group(4)))  # or, output, input1, input2
+            gates.append((2, or_match.group(1), or_match.group(2), or_match.group(3), or_match.group(4)))  # or, output, input1, input2
             continue
 
         # 解析 NOR gate (雙輸入 gate)
         nor_match = re.match(r'^\s*nor\s+(\S+)\((\S+)\s*,\s*(\S+)\s*,\s*(\S+)\);', line)
         if nor_match:
-            gates.append(('NOR', nor_match.group(1), nor_match.group(2), nor_match.group(3), nor_match.group(4)))  # nor, output, input1, input2
+            gates.append((3, nor_match.group(1), nor_match.group(2), nor_match.group(3), nor_match.group(4)))  # nor, output, input1, input2
             continue
 
         # 解析 NOT gate (單輸入 gate)
         not_match = re.match(r'^\s*not\s+(\S+)\((\S+)\s*,\s*(\S+)\);', line)
         if not_match:
-            gates.append(('NOT', not_match.group(1), not_match.group(2), not_match.group(3)))  # not, output, input
+            gates.append((4, not_match.group(1), not_match.group(2), not_match.group(3)))  # not, output, input
             continue
 
         # 解析 XOR gate (雙輸入 gate)
         xor_match = re.match(r'^\s*xor\s+(\S+)\((\S+)\s*,\s*(\S+)\s*,\s*(\S+)\);', line)
         if xor_match:
-            gates.append(('XOR', xor_match.group(1), xor_match.group(2), xor_match.group(3), xor_match.group(4)))  # xor, output, input1, input2
+            gates.append((5, xor_match.group(1), xor_match.group(2), xor_match.group(3), xor_match.group(4)))  # xor, output, input1, input2
             continue
 
         # 解析 AND gate (雙輸入 gate)
         and_match = re.match(r'^\s*and\s+(\S+)\((\S+)\s*,\s*(\S+)\s*,\s*(\S+)\);', line)
         if and_match:
-            gates.append(('AND', and_match.group(1), and_match.group(2), and_match.group(3), and_match.group(4)))  # and, output, input1, input2
+            gates.append((6, and_match.group(1), and_match.group(2), and_match.group(3), and_match.group(4)))  # and, output, input1, input2
             continue
 
         # 解析 NAND gate (雙輸入 gate)
         nand_match = re.match(r'^\s*nand\s+(\S+)\((\S+)\s*,\s*(\S+)\s*,\s*(\S+)\);', line)
         if nand_match:
-            gates.append(('NAND', nand_match.group(1), nand_match.group(2), nand_match.group(3), nand_match.group(4)))  # nand, output, input1, input2
+            gates.append((7, nand_match.group(1), nand_match.group(2), nand_match.group(3), nand_match.group(4)))  # nand, output, input1, input2
             continue
 
         # 解析 XNOR gate (雙輸入 gate)
         xnor_match = re.match(r'^\s*xnor\s+(\S+)\((\S+)\s*,\s*(\S+)\s*,\s*(\S+)\);', line)
         if xnor_match:
-            gates.append(('XNOR', xnor_match.group(1), xnor_match.group(2), xnor_match.group(3), xnor_match.group(4)))  # xor, output, input1, input2
+            gates.append((8, xnor_match.group(1), xnor_match.group(2), xnor_match.group(3), xnor_match.group(4)))  # xor, output, input1, input2
             continue
     #print(gates)
     return gates, primary_inputs, primary_outputs
@@ -203,18 +203,18 @@ def build_graph_features(infolist, primary_inputs=None, primary_outputs=None):
     class_map = {}
     train_indices = list(range(numnodes))  # 全部都當 train
 
-    gatelist = sorted(list(set([x[0] for x in infolist])))
-    gatelookup = {g: i for i, g in enumerate(gatelist)}
+    # gatelist = sorted(list(set([x[0] for x in infolist])))
+    # gatelookup = {g: i for i, g in enumerate(gatelist)}
 
     # feature: one-hot + in degree + out degree + bfs detection?(Loretta :所以我把他變成+3喔)
-    feats = np.zeros((numnodes, len(gatelist) + 4))
+    feats = np.zeros((numnodes, 1 + 4))
     gate_map={}
     lookup = build_lookup(infolist, primary_outputs)
 
     for i, info in enumerate(infolist):
         gatetype = info[0]
         conns = info[5]
-        feats[i][gatelookup[gatetype]] = 1
+        feats[i][0] = gatetype
 
         # Loretta
         output_wire = conns[0]  # output wire
