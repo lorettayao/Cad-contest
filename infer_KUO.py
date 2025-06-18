@@ -50,7 +50,8 @@ def run_inference(model_path, feats_path, adj_path, pred_path, train_config, dev
 
     adj = load_npz(adj_path).astype(np.int32)
     normalized_adj = adj_norm(adj).tocoo()
-    feats = np.load(feats_path)
+    feats_npz = np.load(feats_path)
+    feats = feats_npz['feats']  # 取出實際的 ndarray
     scaler = StandardScaler()
     scaler.fit(feats)
     feats = scaler.transform(feats)
