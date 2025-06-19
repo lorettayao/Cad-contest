@@ -307,7 +307,7 @@ def process_single_verilog(filepath, gt_trojan_filepath=None):
                 trojan_gates = []
     infolist = gates_to_infolist(gates, trojan_gates)
     adj, feats, train_indices, class_map, gate_map = build_graph_features(infolist, primary_inputs, primary_outputs)
-    output_dir = "./output/" + os.path.splitext(os.path.basename(filepath))[0]
+    output_dir = "./GraphSAINT/data/parsered_features4/" + os.path.splitext(os.path.basename(filepath))[0]
     save_graphsage_format(adj, feats, class_map, train_indices, gate_map, output_dir)
 
     print("✅ Graph feature files saved.")
