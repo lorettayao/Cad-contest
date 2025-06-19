@@ -102,7 +102,7 @@ def parse_verilog(verilog_code):
         # 解析 BUF gate
         buf_match = re.match(r'^\s*buf\s+(\S+)\((\S+),\s*(\S+)\);', line)
         if buf_match:
-            gates.append((0, buf_match.group(1), buf_match.group(2), buf_match.group(3)))  # buf, output, input
+            gates.append((9, buf_match.group(1), buf_match.group(2), buf_match.group(3)))  # buf, output, input
             continue
 
         # 解析 DFF gate（具名端口的 DFF gate，處理 .RN, .SN 等）
