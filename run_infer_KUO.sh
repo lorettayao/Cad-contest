@@ -1,5 +1,5 @@
-design_name="design26"
-timestamp="2025-06-19_03-14-51"
+design_name="design10"
+timestamp="2025-06-19_14-56-56"
 python3 infer_KUO.py \
     --model ./trained_model/${timestamp}/saved_model_${timestamp}.pkl \
     --features GraphSAINT/data/parsered_features/${design_name}/feat_full.npz \
