@@ -133,7 +133,7 @@ def generate_iccad_output(preds, gate_to_index, output_path="output_result.txt",
     ]
 
     with open(output_path, 'w') as f:
-        if trojan_gate_list:
+        if len(trojan_gate_list) >= 15
             f.write("TROJANED\nTROJAN_GATES\n")
             for gate in trojan_gate_list:
                 f.write(f"{gate}\n")
