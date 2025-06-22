@@ -1,4 +1,4 @@
-## Clone this reop
+## Clone this repo
 ```
 git clone https://github.com/lorettayao/Cad-contest.git
 cd Cad-contest
