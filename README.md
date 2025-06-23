@@ -24,3 +24,12 @@ python parser.py
 ```
 bash run_infer_KUO.sh
 ```
+## Run train
+```
+python parser.py
+bash concat.sh
+pip install -r requirements.txt
+cd GraphSAINT
+python setup.py build_ext --inplace
+bash run_train.sh
+```
