@@ -7,8 +7,6 @@ cd Cad-contest
 ```
 rm -rf GraphSAINT
 unzip GraphSAINT.zip
-mv GraphSAINT/content/GraphSAINT GraphSAINT
-
 ```
 ## Build requirements
 ```
