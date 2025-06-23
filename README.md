@@ -17,7 +17,7 @@ pip3 install -r requirements.txt
 ## Run parser
 
 ```
-python parser.py
+python3 parser.py
 ```
 ## Run inference
 ```
