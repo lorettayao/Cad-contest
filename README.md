@@ -10,9 +10,9 @@ unzip GraphSAINT.zip
 ```
 ## Build requirements
 ```
-conda create -n cad_env python=3.8
+conda create -n cad_env python==3.8
 conda activate cad_env
-pip install -r requirements.txt
+pip3 install -r requirements.txt
 ```
 ## Run parser
 
