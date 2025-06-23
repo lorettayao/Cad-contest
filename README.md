@@ -20,10 +20,10 @@ pip install -r requirements.txt
 python parser.py
 ```
 ## Run inference
-
 ```
 bash run_infer_KUO.sh
 ```
+You can change the verilog design in this .sh
 ## Run train
 ```
 python parser.py
