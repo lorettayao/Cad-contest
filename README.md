@@ -23,12 +23,14 @@ python3 parser.py
 ```
 bash run_infer_KUO.sh
 ```
-You can change the verilog design in this .sh
+You can change the verilog design in this .sh by changing the design_name.
 ## Run train
 ```
 python parser.py
+cd concat_train
 bash concat.sh
-pip install -r requirements.txt
+cd ..
+pip3 install -r requirements.txt
 cd GraphSAINT
 python setup.py build_ext --inplace
 bash run_train.sh
